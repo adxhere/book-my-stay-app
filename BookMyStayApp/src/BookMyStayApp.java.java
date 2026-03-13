@@ -1,34 +1,71 @@
+import java.util.HashMap;
+
+/**
+ * Use Case 3: Centralized Room Inventory Management
+ *
+ * Demonstrates centralized room availability management
+ * using a HashMap to avoid scattered availability variables.
+ *
+ * @author Jai Aaditya
+ * @version 1.0
+ */
+
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        System.out.println("Hotel Room Initialization\n");
+        System.out.println("Hotel Room Inventory Status\n");
 
         // Create room objects
         Room single = new SingleRoom();
         Room doubleRoom = new DoubleRoom();
         Room suite = new SuiteRoom();
 
-        // Static availability variables
-        int singleAvailable = 5;
-        int doubleAvailable = 3;
-        int suiteAvailable = 2;
+        // Initialize inventory
+        RoomInventory inventory = new RoomInventory();
 
-        // Display details
-        single.displayRoomDetails("Single Room");
-        System.out.println("Available: " + singleAvailable);
+        // Display room details with inventory
+        displayRoom(single, "Single Room", inventory);
+        displayRoom(doubleRoom, "Double Room", inventory);
+        displayRoom(suite, "Suite Room", inventory);
+
+    }
+
+    static void displayRoom(Room room, String type, RoomInventory inventory) {
+
+        room.displayRoomDetails(type);
+        System.out.println("Available Rooms: " + inventory.getAvailability(type));
         System.out.println();
 
-        doubleRoom.displayRoomDetails("Double Room");
-        System.out.println("Available: " + doubleAvailable);
-        System.out.println();
-
-        suite.displayRoomDetails("Suite Room");
-        System.out.println("Available: " + suiteAvailable);
     }
 }
 
-/* ---------------- ABSTRACT CLASS ---------------- */
+/* ---------------- ROOM INVENTORY ---------------- */
+
+class RoomInventory {
+
+    private HashMap<String, Integer> inventory;
+
+    RoomInventory() {
+
+        inventory = new HashMap<>();
+
+        // initialize availability
+        inventory.put("Single Room", 5);
+        inventory.put("Double Room", 3);
+        inventory.put("Suite Room", 2);
+    }
+
+    int getAvailability(String roomType) {
+        return inventory.get(roomType);
+    }
+
+    void updateAvailability(String roomType, int newCount) {
+        inventory.put(roomType, newCount);
+    }
+}
+
+/* ---------------- ABSTRACT ROOM ---------------- */
 
 abstract class Room {
 

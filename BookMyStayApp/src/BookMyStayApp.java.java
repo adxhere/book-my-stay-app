@@ -1,10 +1,10 @@
 import java.util.HashMap;
 
 /**
- * Use Case 3: Centralized Room Inventory Management
+ * Use Case 4: Room Search & Availability Check
  *
- * Demonstrates centralized room availability management
- * using a HashMap to avoid scattered availability variables.
+ * Demonstrates read-only room search functionality
+ * using centralized inventory without modifying system state.
  *
  * @author Jai Aaditya
  * @version 1.0
@@ -14,7 +14,7 @@ public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        System.out.println("Hotel Room Inventory Status\n");
+        System.out.println("Room Search\n");
 
         // Create room objects
         Room single = new SingleRoom();
@@ -24,23 +24,41 @@ public class BookMyStayApp {
         // Initialize inventory
         RoomInventory inventory = new RoomInventory();
 
-        // Display room details with inventory
-        displayRoom(single, "Single Room", inventory);
-        displayRoom(doubleRoom, "Double Room", inventory);
-        displayRoom(suite, "Suite Room", inventory);
+        // Search service
+        SearchService search = new SearchService(inventory);
 
-    }
-
-    static void displayRoom(Room room, String type, RoomInventory inventory) {
-
-        room.displayRoomDetails(type);
-        System.out.println("Available Rooms: " + inventory.getAvailability(type));
-        System.out.println();
+        // Perform room search
+        search.displayAvailableRoom(single, "Single Room");
+        search.displayAvailableRoom(doubleRoom, "Double Room");
+        search.displayAvailableRoom(suite, "Suite Room");
 
     }
 }
 
-/* ---------------- ROOM INVENTORY ---------------- */
+/* ---------------- SEARCH SERVICE ---------------- */
+
+class SearchService {
+
+    private RoomInventory inventory;
+
+    SearchService(RoomInventory inventory) {
+        this.inventory = inventory;
+    }
+
+    void displayAvailableRoom(Room room, String type) {
+
+        int available = inventory.getAvailability(type);
+
+        // Defensive check
+        if (available > 0) {
+            room.displayRoomDetails(type);
+            System.out.println("Available: " + available);
+            System.out.println();
+        }
+    }
+}
+
+/* ---------------- INVENTORY ---------------- */
 
 class RoomInventory {
 
@@ -50,7 +68,6 @@ class RoomInventory {
 
         inventory = new HashMap<>();
 
-        // initialize availability
         inventory.put("Single Room", 5);
         inventory.put("Double Room", 3);
         inventory.put("Suite Room", 2);
@@ -59,13 +76,9 @@ class RoomInventory {
     int getAvailability(String roomType) {
         return inventory.get(roomType);
     }
-
-    void updateAvailability(String roomType, int newCount) {
-        inventory.put(roomType, newCount);
-    }
 }
 
-/* ---------------- ABSTRACT ROOM ---------------- */
+/* ---------------- ROOM DOMAIN MODEL ---------------- */
 
 abstract class Room {
 
@@ -80,6 +93,7 @@ abstract class Room {
     }
 
     void displayRoomDetails(String type) {
+
         System.out.println(type + ":");
         System.out.println("Beds: " + beds);
         System.out.println("Size: " + size + " sqft");
@@ -87,7 +101,7 @@ abstract class Room {
     }
 }
 
-/* ---------------- SINGLE ROOM ---------------- */
+/* ---------------- ROOM TYPES ---------------- */
 
 class SingleRoom extends Room {
 
@@ -96,16 +110,12 @@ class SingleRoom extends Room {
     }
 }
 
-/* ---------------- DOUBLE ROOM ---------------- */
-
 class DoubleRoom extends Room {
 
     DoubleRoom() {
         super(2, 400, 2500.0);
     }
 }
-
-/* ---------------- SUITE ROOM ---------------- */
 
 class SuiteRoom extends Room {
 
